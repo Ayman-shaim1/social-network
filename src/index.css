@@ -1,0 +1,22 @@
+body {
+  background-color: #f4f4f4 !important;
+}
+
+main {
+  min-height: 700px;
+}
+
+footer {
+  position: static;
+  width: 100%;
+  bottom: 0;
+}
+
+textarea {
+  resize: none !important;
+}
+
+.material-icons {
+  font-size: 16px !important;
+  margin-right: 5px;
+}
