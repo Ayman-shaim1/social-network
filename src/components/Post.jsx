@@ -6,20 +6,38 @@ import {
   Text,
   Icon,
   Tooltip,
+  Progress,
+  useToast,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CloseIcon } from "@chakra-ui/icons";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { removePost, resetRemovePost } from "../redux/post/postActions";
 
 const Post = ({ post }) => {
+  const [loading, setLoading] = useState(false);
   const userLogin = useSelector(state => state.userLogin);
   const { userInfo } = userLogin;
-
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const postRemove = useSelector(state => state.postRemove);
+  const { success: removePostSuccess } = postRemove;
+
+  const removePostHandler = () => {
+    setLoading(true);
+    dispatch(removePost(post.id));
+  };
+
+  useEffect(() => {
+    if (removePostSuccess) {
+      setLoading(false);
+    }
+  }, [removePostSuccess]);
 
   return (
     <Card marginBottom={"2"}>
+      {loading && <Progress size='xs' isIndeterminate />}
       <CardBody>
         <Flex
           justifyContent={"space-between"}
@@ -35,7 +53,12 @@ const Post = ({ post }) => {
 
           {userInfo.id === post.user_id && (
             <Tooltip label='remove this post' hasArrow placement='right-start'>
-              <Icon as={CloseIcon} cursor={"pointer"} color={"gray.600"} />
+              <Icon
+                as={CloseIcon}
+                cursor={"pointer"}
+                color={"gray.600"}
+                onClick={removePostHandler}
+              />
             </Tooltip>
           )}
         </Flex>

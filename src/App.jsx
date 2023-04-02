@@ -1,4 +1,4 @@
-import { Container } from "@chakra-ui/react";
+import { Container, useToast } from "@chakra-ui/react";
 import { Footer, Header } from "./components";
 import {
   HomePage,
@@ -8,12 +8,34 @@ import {
   RegisterPage,
 } from "./pages";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import ProtectedRoute from "./routes/ProtectedRoute";
+import { useEffect } from "react";
+import { resetRemovePost } from "./redux/post/postActions";
 
 function App() {
+  const toast = useToast();
+  const dispatch = useDispatch();
+
   const userLogin = useSelector(state => state.userLogin);
   const { userInfo } = userLogin;
+
+  const postRemove = useSelector(state => state.postRemove);
+  const { success: removePostSuccess } = postRemove;
+
+  useEffect(() => {
+    if (removePostSuccess) {
+      dispatch(resetRemovePost());
+      toast({
+        title: "Post removed.",
+        description: "Your post have been removed successfully",
+        status: "success",
+        duration: 2000,
+        isClosable: true,
+      });
+    }
+  }, [removePostSuccess]);
+
   return (
     <Router>
       {userInfo && <Header />}

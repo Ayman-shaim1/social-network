@@ -23,9 +23,10 @@ const AddPost = () => {
         title: "Post created.",
         description: "Your post have been created successfully",
         status: "success",
-        duration: 9000,
+        duration: 2000,
         isClosable: true,
       });
+      setContent("");
     }
   }, [success]);
 
