@@ -7,12 +7,21 @@ import {
   POST_GET_LIST_REQUEST,
   POST_GET_LIST_RESET,
   POST_GET_LIST_SUCCESS,
-  POST_LIST_UPDATE_ADD_POST,
-  POST_LIST_UPDATE_DELETE_POST,
+  POST_GET_LIST_UPDATE_ADD_POST,
+  POST_GET_LIST_UPDATE_DELETE_POST,
   POST_REMOVE_FAIL,
   POST_REMOVE_REQUEST,
   POST_REMOVE_RESET,
   POST_REMOVE_SUCCESS,
+  POST_GET_LIST_UPDATE_TOGGLE_LIKE,
+  POST_TOGGLE_LIKE_FAIL,
+  POST_TOGGLE_LIKE_REQUEST,
+  POST_TOGGLE_LIKE_RESET,
+  POST_TOGGLE_LIKE_SUCCESS,
+  POST_GET_BY_ID_FAIL,
+  POST_GET_BY_ID_REQUEST,
+  POST_GET_BY_ID_RESET,
+  POST_GET_BY_ID_SUCCESS,
 } from "./postTypes";
 import axios from "axios";
 
@@ -49,6 +58,40 @@ export const resetGetPosts = () => {
   return { type: POST_GET_LIST_RESET };
 };
 
+export const getPostById = id => {
+  return async (dispatch, getState) => {
+    try {
+      dispatch({
+        type: POST_GET_BY_ID_REQUEST,
+      });
+
+      const {
+        userLogin: { userInfo },
+      } = getState();
+
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${userInfo.token}`,
+        },
+      };
+
+      const { data } = await axios.get(`/api/posts/${id}`, config);
+      dispatch({ type: POST_GET_BY_ID_SUCCESS, payload: data });
+      
+    } catch (error) {
+      dispatch({
+        type: POST_GET_BY_ID_FAIL,
+        payload: error.response.data.errors,
+      });
+    }
+  };
+};
+
+export const resetGetPostById = () => {
+  return { type: POST_GET_BY_ID_RESET };
+};
+
 export const createPost = content => {
   return async (dispatch, getState) => {
     try {
@@ -79,7 +122,7 @@ export const createPost = content => {
       });
 
       dispatch({
-        type: POST_LIST_UPDATE_ADD_POST,
+        type: POST_GET_LIST_UPDATE_ADD_POST,
         payload: data,
       });
     } catch (error) {
@@ -121,7 +164,7 @@ export const removePost = id => {
       });
 
       dispatch({
-        type: POST_LIST_UPDATE_DELETE_POST,
+        type: POST_GET_LIST_UPDATE_DELETE_POST,
         payload: id,
       });
     } catch (error) {
@@ -135,4 +178,49 @@ export const removePost = id => {
 
 export const resetRemovePost = () => {
   return { type: POST_REMOVE_RESET };
+};
+
+export const toggleLike = id => {
+  return async (dispatch, getState) => {
+    try {
+      dispatch({
+        type: POST_TOGGLE_LIKE_REQUEST,
+      });
+
+      const {
+        userLogin: { userInfo },
+      } = getState();
+
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${userInfo.token}`,
+        },
+      };
+
+      const { data } = await axios.put(
+        `/api/posts/togglelike/${id}`,
+        {},
+        config
+      );
+      console.log(data);
+      dispatch({
+        type: POST_TOGGLE_LIKE_SUCCESS,
+      });
+
+      dispatch({
+        type: POST_GET_LIST_UPDATE_TOGGLE_LIKE,
+        payload: { id, likes: data },
+      });
+    } catch (error) {
+      dispatch({
+        type: POST_TOGGLE_LIKE_FAIL,
+        payload: error.response.data.errors,
+      });
+    }
+  };
+};
+
+export const resetToggleLikePost = () => {
+  return { type: POST_TOGGLE_LIKE_RESET };
 };

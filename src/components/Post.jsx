@@ -7,33 +7,43 @@ import {
   Icon,
   Tooltip,
   Progress,
-  useToast,
+  Box,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CloseIcon } from "@chakra-ui/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { removePost, resetRemovePost } from "../redux/post/postActions";
+import { removePost, toggleLike } from "../redux/post/postActions";
 
 const Post = ({ post }) => {
   const [loading, setLoading] = useState(false);
-  const userLogin = useSelector(state => state.userLogin);
-  const { userInfo } = userLogin;
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const userLogin = useSelector(state => state.userLogin);
+  const { userInfo } = userLogin;
+
   const postRemove = useSelector(state => state.postRemove);
-  const { success: removePostSuccess } = postRemove;
+  const { success: postRemoveSuccess } = postRemove;
+
+  const postToggleLike = useSelector(state => state.postToggleLike);
+  const { loading: postToggleLikeLoading } = postToggleLike;
 
   const removePostHandler = () => {
     setLoading(true);
     dispatch(removePost(post.id));
   };
 
+  const toggleLikeHandler = () => {
+    dispatch(toggleLike(post.id));
+  };
+
   useEffect(() => {
-    if (removePostSuccess) {
+    if (postRemoveSuccess) {
       setLoading(false);
     }
-  }, [removePostSuccess]);
+  }, [postRemoveSuccess]);
 
   return (
     <Card marginBottom={"2"}>
@@ -66,17 +76,37 @@ const Post = ({ post }) => {
           {post.content}
         </Text>
         <Flex marginTop={"2"}>
-          <Tooltip label='like this post' hasArrow>
-            <Button variant={"ghost"}>
-              <span class='material-icons'>favorite</span>
-              <Text marginLeft={"2"}>{post.likes.length}</Text>
+          <Tooltip
+            label={
+              post.likes.findIndex(like => like.user_id === userInfo.id) !== -1
+                ? "unlike this post"
+                : "like this post"
+            }
+            hasArrow>
+            <Button
+              variant={"ghost"}
+              onClick={toggleLikeHandler}
+              //disabled={postToggleLikeLoading}
+            >
+              <Box
+                as='span'
+                className='material-icons'
+                color={
+                  post.likes.findIndex(like => like.user_id === userInfo.id) !==
+                    -1 && "red.400"
+                }>
+                favorites
+              </Box>
+              <Text marginLeft={"-1.5"}>{post.likes.length}</Text>
             </Button>
           </Tooltip>
           <Tooltip label='add comment to this post' hasArrow>
             <Button
               variant={"ghost"}
               onClick={() => navigate(`/post/${post.id}`)}>
-              <span class='material-icons'>chat_bubble</span>
+              <Box as='span' className='material-icons'>
+                chat_bubble
+              </Box>
               <Text marginLeft={"2"}>{post.comments.length}</Text>
             </Button>
           </Tooltip>

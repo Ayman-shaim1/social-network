@@ -7,12 +7,23 @@ import {
   POST_GET_LIST_REQUEST,
   POST_GET_LIST_RESET,
   POST_GET_LIST_SUCCESS,
-  POST_LIST_UPDATE_ADD_POST,
-  POST_LIST_UPDATE_DELETE_POST,
   POST_REMOVE_FAIL,
   POST_REMOVE_REQUEST,
   POST_REMOVE_RESET,
   POST_REMOVE_SUCCESS,
+  POST_GET_LIST_UPDATE_TOGGLE_LIKE,
+  POST_GET_LIST_UPDATE_ADD_POST,
+  POST_GET_LIST_UPDATE_DELETE_POST,
+  POST_GET_LIST_UPDATE_COMMENT,
+  POST_GET_LIST_UPDATE_DELETE_COMMENT,
+  POST_TOGGLE_LIKE_FAIL,
+  POST_TOGGLE_LIKE_REQUEST,
+  POST_TOGGLE_LIKE_RESET,
+  POST_TOGGLE_LIKE_SUCCESS,
+  POST_GET_BY_ID_FAIL,
+  POST_GET_BY_ID_REQUEST,
+  POST_GET_BY_ID_RESET,
+  POST_GET_BY_ID_SUCCESS,
 } from "./postTypes";
 
 export const postListReducer = (state = { posts: [] }, action) => {
@@ -23,67 +34,71 @@ export const postListReducer = (state = { posts: [] }, action) => {
     case POST_GET_LIST_SUCCESS:
       return { loading: false, posts: payload };
 
-    case POST_LIST_UPDATE_ADD_POST:
+    case POST_GET_LIST_UPDATE_ADD_POST:
       return { success: true, posts: [payload, ...state.posts] };
-    case POST_LIST_UPDATE_DELETE_POST:
+    case POST_GET_LIST_UPDATE_DELETE_POST:
       return {
         success: true,
         posts: state.posts.filter(post => String(post.id) !== String(payload)),
       };
-    // case POST_LIST_UPDATE_LIKE:
-    //   return {
-    //     posts: state.posts.map(post => {
-    //       if (post._id === payload.id) {
-    //         post.likes = payload.likes;
-    //         return post;
-    //       } else {
-    //         return post;
-    //       }
-    //     }),
-    //     success: true,
-    //   };
-    // case POST_LIST_UPDATE_UNLIKE:
-    //   return {
-    //     success: true,
-    //     posts: state.posts.map(post => {
-    //       if (post._id === payload.id) {
-    //         post.likes = payload.likes;
-    //         return post;
-    //       } else {
-    //         return post;
-    //       }
-    //     }),
-    //   };
+    case POST_GET_LIST_UPDATE_TOGGLE_LIKE:
+      return {
+        posts: state.posts.map(post => {
+          if (post.id === payload.id) {
+            post.likes = payload.likes;
+            return post;
+          } else {
+            return post;
+          }
+        }),
+        success: true,
+      };
 
-    // case POST_GET_LIST_UPDATE_COMMENT:
-    //   return {
-    //     success: true,
-    //     posts: state.posts.map(post => {
-    //       if (String(post._id) === String(payload.id)) {
-    //         post.comments = payload.comments;
-    //         return post;
-    //       } else {
-    //         return post;
-    //       }
-    //     }),
-    //   };
-    // case POST_GET_LIST_UPDATE_DELETE_COMMENT:
-    // return {
-    //   success: true,
-    //   posts: state.posts.map(post => {
-    //     if (String(post._id) === String(payload.id)) {
-    //       post.comments = payload.comments;
-    //       return post;
-    //     } else {
-    //       return post;
-    //     }
-    //   }),
-    // };
+    case POST_GET_LIST_UPDATE_COMMENT:
+      return {
+        success: true,
+        posts: state.posts.map(post => {
+          if (String(post.id) === String(payload.id)) {
+            post.comments = payload.comments;
+            return post;
+          } else {
+            return post;
+          }
+        }),
+      };
+    case POST_GET_LIST_UPDATE_DELETE_COMMENT:
+      return {
+        success: true,
+        posts: state.posts.map(post => {
+          if (String(post.id) === String(payload.id)) {
+            post.comments = payload.comments;
+            return post;
+          } else {
+            return post;
+          }
+        }),
+      };
 
     case POST_GET_LIST_FAIL:
       return { loading: false, errors: payload, posts: [] };
     case POST_GET_LIST_RESET:
       return { posts: [] };
+    default:
+      return state;
+  }
+};
+
+export const postGetByIdReducer = (state = {}, action) => {
+  const { payload, type } = action;
+  switch (type) {
+    case POST_GET_BY_ID_REQUEST:
+      return { loading: true };
+    case POST_GET_BY_ID_SUCCESS:
+      return { loading: false, post: payload, success: true };
+    case POST_GET_BY_ID_FAIL:
+      return { loading: false, errors: payload };
+    case POST_GET_BY_ID_RESET:
+      return {};
     default:
       return state;
   }
@@ -115,6 +130,22 @@ export const postRemoveReducer = (state = {}, action) => {
     case POST_REMOVE_FAIL:
       return { loading: false, errors: payload };
     case POST_REMOVE_RESET:
+      return {};
+    default:
+      return state;
+  }
+};
+
+export const postToggleLikeReducer = (state = {}, action) => {
+  const { payload, type } = action;
+  switch (type) {
+    case POST_TOGGLE_LIKE_REQUEST:
+      return { loading: true };
+    case POST_TOGGLE_LIKE_SUCCESS:
+      return { loading: false, success: true };
+    case POST_TOGGLE_LIKE_FAIL:
+      return { loading: false, errors: payload };
+    case POST_TOGGLE_LIKE_RESET:
       return {};
     default:
       return state;
