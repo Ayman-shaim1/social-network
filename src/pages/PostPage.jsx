@@ -38,9 +38,16 @@ const PostPage = () => {
     post,
   } = postGetById;
 
+  const postAddComment = useSelector(state => state.postAddComment);
+  const { errors: postAddCommentErrors } = postAddComment;
+
+  const postRemoveComment = useSelector(state => state.postRemoveComment);
+  const { errors: postRemoveCommentErrors } = postRemoveComment;
+
   const toggleLikeHandler = () => {
     dispatch(toggleLike(post.id));
   };
+
   useEffect(() => {
     if (!success) {
       dispatch(getPostById(params.id));
@@ -75,6 +82,22 @@ const PostPage = () => {
       {postGetByIdErrors &&
         postGetByIdErrors.length > 0 &&
         postGetByIdErrors.map(error => (
+          <Alert status='error' marginBottom={"2.5"}>
+            <AlertIcon />
+            {error}
+          </Alert>
+        ))}
+      {postAddCommentErrors &&
+        postAddCommentErrors.length > 0 &&
+        postAddCommentErrors.map(error => (
+          <Alert status='error' marginBottom={"2.5"}>
+            <AlertIcon />
+            {error}
+          </Alert>
+        ))}
+      {postRemoveCommentErrors &&
+        postRemoveCommentErrors.length > 0 &&
+        postRemoveCommentErrors.map(error => (
           <Alert status='error' marginBottom={"2.5"}>
             <AlertIcon />
             {error}
@@ -122,10 +145,12 @@ const PostPage = () => {
           </Card>
 
           <hr />
-          <AddComment />
+          <AddComment idPost={post && post.id} />
           {post &&
             post.comments.length > 0 &&
-            post.comments.map(comment => <Comment key={comment.id} />)}
+            post.comments.map(comment => (
+              <Comment key={comment.id} comment={comment} />
+            ))}
         </>
       )}
     </>

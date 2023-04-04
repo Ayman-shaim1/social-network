@@ -22,6 +22,17 @@ import {
   POST_GET_BY_ID_REQUEST,
   POST_GET_BY_ID_RESET,
   POST_GET_BY_ID_SUCCESS,
+  POST_GET_BY_ID_UPDATE_TOGGLE_LIKE,
+  POST_ADD_COMMENT_FAIL,
+  POST_ADD_COMMENT_REQUEST,
+  POST_ADD_COMMENT_RESET,
+  POST_ADD_COMMENT_SUCCESS,
+  POST_REMOVE_COMMENT_FAIL,
+  POST_REMOVE_COMMENT_REQUEST,
+  POST_REMOVE_COMMENT_RESET,
+  POST_REMOVE_COMMENT_SUCCESS,
+  POST_GET_BY_ID_UPDATE_COMMENT,
+  POST_GET_BY_ID_UPDATE_DELETE_COMMENT,
 } from "./postTypes";
 import axios from "axios";
 
@@ -78,7 +89,6 @@ export const getPostById = id => {
 
       const { data } = await axios.get(`/api/posts/${id}`, config);
       dispatch({ type: POST_GET_BY_ID_SUCCESS, payload: data });
-      
     } catch (error) {
       dispatch({
         type: POST_GET_BY_ID_FAIL,
@@ -191,6 +201,10 @@ export const toggleLike = id => {
         userLogin: { userInfo },
       } = getState();
 
+      const {
+        postGetById: { post },
+      } = getState();
+
       const config = {
         headers: {
           "Content-Type": "application/json",
@@ -204,6 +218,7 @@ export const toggleLike = id => {
         config
       );
       console.log(data);
+
       dispatch({
         type: POST_TOGGLE_LIKE_SUCCESS,
       });
@@ -212,7 +227,14 @@ export const toggleLike = id => {
         type: POST_GET_LIST_UPDATE_TOGGLE_LIKE,
         payload: { id, likes: data },
       });
+      if (post) {
+        dispatch({
+          type: POST_GET_BY_ID_UPDATE_TOGGLE_LIKE,
+          payload: data,
+        });
+      }
     } catch (error) {
+      console.log(error);
       dispatch({
         type: POST_TOGGLE_LIKE_FAIL,
         payload: error.response.data.errors,
@@ -223,4 +245,96 @@ export const toggleLike = id => {
 
 export const resetToggleLikePost = () => {
   return { type: POST_TOGGLE_LIKE_RESET };
+};
+
+export const addComment = (id, content) => {
+  return async (dispatch, getState) => {
+    try {
+      dispatch({
+        type: POST_ADD_COMMENT_REQUEST,
+      });
+
+      const {
+        userLogin: { userInfo },
+      } = getState();
+
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${userInfo.token}`,
+        },
+      };
+
+      const { data } = await axios.post(
+        `/api/posts/comment/${id}`,
+        { content: content },
+        config
+      );
+
+      dispatch({
+        type: POST_ADD_COMMENT_SUCCESS,
+      });
+
+      dispatch({
+        type: POST_GET_BY_ID_UPDATE_COMMENT,
+        payload: data,
+      });
+    } catch (error) {
+      console.log(error);
+      dispatch({
+        type: POST_ADD_COMMENT_FAIL,
+        payload: error.response.data.errors,
+      });
+    }
+  };
+};
+
+export const resetAddComment = () => {
+  return { type: POST_ADD_COMMENT_RESET };
+};
+
+export const removeComment = (idPost, idComment) => {
+  return async (dispatch, getState) => {
+    try {
+      dispatch({
+        type: POST_REMOVE_COMMENT_REQUEST,
+      });
+
+      const {
+        userLogin: { userInfo },
+      } = getState();
+
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${userInfo.token}`,
+        },
+      };
+
+      const { data } = await axios.delete(
+        `/api/posts/${idPost}/comment/${idComment}`,
+        config
+      );
+      console.log(data);
+
+      dispatch({
+        type: POST_REMOVE_COMMENT_SUCCESS,
+      });
+
+      dispatch({
+        type: POST_GET_BY_ID_UPDATE_DELETE_COMMENT,
+        payload: data,
+      });
+    } catch (error) {
+      console.log(error);
+      dispatch({
+        type: POST_REMOVE_COMMENT_FAIL,
+        payload: error.response.data.errors,
+      });
+    }
+  };
+};
+
+export const resetRemoveComment = () => {
+  return { type: POST_REMOVE_COMMENT_RESET };
 };
