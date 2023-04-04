@@ -19,6 +19,7 @@ import {
   resetGetPostById,
   toggleLike,
 } from "../redux/post/postActions";
+import { useDateDiff } from "../hooks";
 
 const PostPage = () => {
   const [callApi, setCallApi] = useState(false);
@@ -26,11 +27,12 @@ const PostPage = () => {
   const params = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const dateDiff = useDateDiff();
 
-  const userLogin = useSelector(state => state.userLogin);
+  const userLogin = useSelector((state) => state.userLogin);
   const { userInfo } = userLogin;
 
-  const postGetById = useSelector(state => state.postGetById);
+  const postGetById = useSelector((state) => state.postGetById);
   const {
     loading: postGetByIdLoading,
     errors: postGetByIdErrors,
@@ -38,10 +40,10 @@ const PostPage = () => {
     post,
   } = postGetById;
 
-  const postAddComment = useSelector(state => state.postAddComment);
+  const postAddComment = useSelector((state) => state.postAddComment);
   const { errors: postAddCommentErrors } = postAddComment;
 
-  const postRemoveComment = useSelector(state => state.postRemoveComment);
+  const postRemoveComment = useSelector((state) => state.postRemoveComment);
   const { errors: postRemoveCommentErrors } = postRemoveComment;
 
   const toggleLikeHandler = () => {
@@ -64,8 +66,9 @@ const PostPage = () => {
       <Button
         marginBottom={"2"}
         colorScheme={"blue"}
-        onClick={() => navigate("/")}>
-        <span class='material-icons'>arrow_back</span>
+        onClick={() => navigate("/")}
+      >
+        <span class="material-icons">arrow_back</span>
         posts
       </Button>
 
@@ -74,31 +77,31 @@ const PostPage = () => {
           <CircularProgress
             isIndeterminate
             value={59}
-            size='100px'
-            thickness='4px'
+            size="100px"
+            thickness="4px"
           />
         </Flex>
       )}
       {postGetByIdErrors &&
         postGetByIdErrors.length > 0 &&
-        postGetByIdErrors.map(error => (
-          <Alert status='error' marginBottom={"2.5"}>
+        postGetByIdErrors.map((error) => (
+          <Alert status="error" marginBottom={"2.5"}>
             <AlertIcon />
             {error}
           </Alert>
         ))}
       {postAddCommentErrors &&
         postAddCommentErrors.length > 0 &&
-        postAddCommentErrors.map(error => (
-          <Alert status='error' marginBottom={"2.5"}>
+        postAddCommentErrors.map((error) => (
+          <Alert status="error" marginBottom={"2.5"}>
             <AlertIcon />
             {error}
           </Alert>
         ))}
       {postRemoveCommentErrors &&
         postRemoveCommentErrors.length > 0 &&
-        postRemoveCommentErrors.map(error => (
-          <Alert status='error' marginBottom={"2.5"}>
+        postRemoveCommentErrors.map((error) => (
+          <Alert status="error" marginBottom={"2.5"}>
             <AlertIcon />
             {error}
           </Alert>
@@ -107,34 +110,44 @@ const PostPage = () => {
         <>
           <Card marginBottom={"5"}>
             <CardBody>
-              <Text fontWeight={"semibold"} color={"gray.500"} fontSize={"1xl"}>
-                {post && post.user.name}
-              </Text>
+              <Flex direction={"column"} marginBottom='2.5'>
+                <Text
+                  fontSize={"1xl"}
+                  fontWeight={"semibold "}
+                  color={"gray.600"}
+                >
+                  {post.user.name}
+                </Text>
+
+                <Text color={"gray.500"}>{dateDiff(post.created_at)}</Text>
+              </Flex>
               <Text marginBottom={"4"}>{post && post.content}</Text>
               <hr />
               <Flex marginTop={"2"}>
                 <Tooltip
                   label={
                     post.likes.findIndex(
-                      like => like.user_id === userInfo.id
+                      (like) => like.user_id === userInfo.id
                     ) !== -1
                       ? "unlike this post"
                       : "like this post"
                   }
-                  hasArrow>
+                  hasArrow
+                >
                   <Button
                     variant={"ghost"}
                     onClick={toggleLikeHandler}
                     //disabled={postToggleLikeLoading}
                   >
                     <Box
-                      as='span'
-                      className='material-icons'
+                      as="span"
+                      className="material-icons"
                       color={
                         post.likes.findIndex(
-                          like => like.user_id === userInfo.id
+                          (like) => like.user_id === userInfo.id
                         ) !== -1 && "red.400"
-                      }>
+                      }
+                    >
                       favorites
                     </Box>
                     <Text marginLeft={"-1.5"}>{post.likes.length}</Text>
@@ -148,7 +161,7 @@ const PostPage = () => {
           <AddComment idPost={post && post.id} />
           {post &&
             post.comments.length > 0 &&
-            post.comments.map(comment => (
+            post.comments.map((comment) => (
               <Comment key={comment.id} comment={comment} />
             ))}
         </>

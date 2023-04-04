@@ -6,11 +6,7 @@ main {
   min-height: 700px;
 }
 
-footer {
-  position: static;
-  width: 100%;
-  bottom: 0;
-}
+
 
 textarea {
   resize: none !important;

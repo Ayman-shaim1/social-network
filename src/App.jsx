@@ -1,5 +1,5 @@
 import { Container } from "@chakra-ui/react";
-import { Footer, Header } from "./components";
+import { Header } from "./components";
 import {
   HomePage,
   LoginPage,
@@ -13,7 +13,7 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import { useEffect } from "react";
 
 function App() {
-  const userLogin = useSelector(state => state.userLogin);
+  const userLogin = useSelector((state) => state.userLogin);
   const { userInfo } = userLogin;
 
   useEffect(() => {}, []);
@@ -22,14 +22,14 @@ function App() {
     <Router>
       {userInfo && <Header />}
       <main>
-        <Container paddingY={"5"} maxW='container.sm'>
+        <Container paddingY={"5"} maxW="container.sm">
           <Routes>
-            <Route exact path='/Login' element={<LoginPage />} />
-            <Route exact path='/Register' element={<RegisterPage />} />
+            <Route exact path="/Login" element={<LoginPage />} />
+            <Route exact path="/Register" element={<RegisterPage />} />
 
             <Route
               exact
-              path='/'
+              path="/"
               element={
                 <ProtectedRoute>
                   <HomePage />
@@ -38,7 +38,7 @@ function App() {
             />
             <Route
               exact
-              path='/Home'
+              path="/Home"
               element={
                 <ProtectedRoute>
                   <HomePage />
@@ -48,7 +48,7 @@ function App() {
 
             <Route
               exact
-              path='/Post/:id'
+              path="/Post/:id"
               element={
                 <ProtectedRoute>
                   <PostPage />
@@ -57,7 +57,7 @@ function App() {
             />
             <Route
               exact
-              path='/Profile'
+              path="/Profile"
               element={
                 <ProtectedRoute>
                   <ProfilePage />
@@ -67,7 +67,6 @@ function App() {
           </Routes>
         </Container>
       </main>
-      <Footer />
     </Router>
   );
 }
